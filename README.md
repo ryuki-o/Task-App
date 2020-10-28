@@ -42,3 +42,6 @@ $ rails server
 
 * **email** : sample@email.com
 * **password** : password
+
+
+SSH接続でのgit push完了
