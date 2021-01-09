@@ -1,5 +1,13 @@
 class UsersController < ApplicationController
-  before_action :limitation_correct_user, only: [:edit, :update]
+  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :logged_in_user, only: [:show, :edit, :update, :destroy]
+  before_action :correct_user, only: [:edit, :update]
+  before_action :admin_user, only: :destroy
+  
+  
+  def index
+    @users = User.paginate(page: params[:page])
+  end
   
   
   def show
@@ -35,28 +43,43 @@ class UsersController < ApplicationController
     end
   end
   
+  def destroy
+    @user.destroy
+    flash[:success] = "#{@user.name}のデータを削除しました。"
+    redirect_to users_url
+  end
+  
   def tasks
     @user = User.find(params[:id])
   end
   
-  def logged_in_user
-    unless logged_in?
-      store_location
-      flash[:danger] = "ログインしてください。"
-      redirect_to login_url
-    end
-  end
-  
-  def limitation_correct_user
-    unless @current_user.id == params[:id].to_i
-      flash[:notice] = "他のユーザーの編集はできません。"
-      redirect_to @user
-    end
-  end
   
   private
   
     def user_params
       params.require(:user).permit(:name, :email, :password, :password_confirmation)
+    end
+    
+    def set_user
+      @user = User.find(params[:id])
+    end
+    
+    def logged_in_user
+      unless logged_in?
+        store_location
+        flash[:danger] = "ログインしてください。"
+        redirect_to login_url
+      end
+    end
+  
+
+  
+    def correct_user
+        @user = User.find(params[:id])
+        redirect_to(root_url) unless @user == current_user
+    end
+    
+    def admin_user
+      redirect_to root_url unless current_user.admin?
     end
 end
