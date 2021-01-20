@@ -1,5 +1,16 @@
 class StaticPagesController < ApplicationController
+  before_action :correct_user
+  before_action :admin_user
+  
   def top
-    @user = User.find_by(params[:name])
+    @user = User.find_by(params[:user_id])
   end
+  
+  private
+
+   def admin_user
+   end
+  
+   def correct_user
+   end
 end
