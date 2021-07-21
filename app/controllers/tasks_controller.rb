@@ -1,6 +1,8 @@
 class TasksController < ApplicationController
   before_action :set_user, only: [:index, :show, :new, :create, :edit, :update, :destroy]
   before_action :logged_in_user, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+  before_action :limitation_correct_user, only: [:new]
+  before_action :admin_user, only: [:edit, :update, :destroy]
   
   def index
     @tasks =@user.tasks
@@ -52,15 +54,32 @@ class TasksController < ApplicationController
   end
   
   def logged_in_user
-      unless logged_in?
-        store_location
-        flash[:danger] = "ログインしてください。"
-        redirect_to login_url
-      end
+    unless logged_in?
+      store_location
+      flash[:danger] = "ログインしてください。"
+      redirect_to login_url
+    end
   end
   
+  
   def task_params
-      params.require(:task).permit(:name, :description)
+    params.require(:task).permit(:name, :description)
+  end
+  
+  def limitation_correct_user
+    @user = User.find(params[:user_id])
+    unless @user.id == @current_user.id
+      flash[:danger] = "自分以外のユーザーの投稿はできません"
+      redirect_to root_url
+    end
+  end
+  
+  def admin_user
+    @user = User.find(params[:user_id])
+    unless @user.id == @current_user.id
+      flash[:danger] = "あなたにはその権限はありません"
+      redirect_to user_tasks_url
+    end
   end
 end
   

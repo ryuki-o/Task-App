@@ -17,7 +17,11 @@
       </center>
       
       <center>
+        <% if current_user && current_user.admin? %>
          <%= link_to "アカウント作成", signup_path, class: "btn btn-lg btn-success" %>
+        <% else %>
+         <%= link_to "ダメです", signup_path, class: "btn btn-lg btn-success disabled" %>
+        <% end %>
       </center>
       </div>
     </div>
